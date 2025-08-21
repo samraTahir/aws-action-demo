@@ -1,0 +1,43 @@
+name: Auto Merge Branches
+
+on:
+  push:
+    branches:
+      - dev
+      - temp2
+
+jobs:
+  merge_dev_fanout:
+    if: github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        target: [f1, f2, f3, f4, f5, f6, f7, f8, f9]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Merge dev → ${{ matrix.target }}
+        continue-on-error: true
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: dev
+          target_branch: ${{ matrix.target }}
+          message: Merge dev into ${{ matrix.target }}
+          github_token: ${{ secrets.GH_AUTO_MERGER }}
+
+  merge_temp2_to_uat:
+    if: github.ref == 'refs/heads/temp2'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Merge temp2 → uat
+        continue-on-error: true
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: temp2
+          target_branch: uat
+          message: Merge temp2 into uat
+          github_token: ${{ secrets.GH_AUTO_MERGER }}

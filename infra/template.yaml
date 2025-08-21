@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Minimal per-branch deploy via CloudFormation (creates/updates an SSM parameter)
+
+Parameters:
+  Branch:
+    Type: String
+    Description: Branch name (e.g., dev, f1)
+  CommitSha:
+    Type: String
+    Description: Commit SHA for traceability
+
+Resources:
+  DemoParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/cf-demo/${Branch}/hello"
+      Type: String
+      Value: !Sub "Deployed: branch=${Branch}, sha=${CommitSha}"
+      Tier: Standard
+
+Outputs:
+  ParamName:
+    Value: !Ref DemoParam
+  Info:
+    Value: !Sub "Branch=${Branch}, Sha=${CommitSha}"
